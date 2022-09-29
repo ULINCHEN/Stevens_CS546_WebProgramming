@@ -1,5 +1,6 @@
 function questionOne(arr) {
   // TODO: Implement question 1 here
+  if (!Array.isArray(arr)) return 'Error: Invalid Input';
   const output = new Array();
 
   const isPrime = (num) => {
@@ -12,6 +13,7 @@ function questionOne(arr) {
   }
 
   for (let i of arr) {
+    if (typeof i !== 'number') return 'Error: Invalid Input';
     let cache = isPrime(i);
     output.push(cache);
   }
@@ -22,6 +24,7 @@ function questionOne(arr) {
 
 function questionTwo(startingNumber, commonRatio, numberOfTerms) {
   // TODO: Implement question 2 here
+  if (typeof startingNumber !== 'number' || typeof commonRatio !== 'number' || typeof numberOfTerms !== 'number') return 'Error: Invalid Input';
   if (startingNumber == 0 || commonRatio == 0) return 0;
   if (numberOfTerms <= 0 || numberOfTerms % 1 != 0) return NaN;
 
@@ -39,6 +42,7 @@ function questionTwo(startingNumber, commonRatio, numberOfTerms) {
 
 function questionThree(str) {
   // TODO: Implement question 3 here
+  if (typeof str !== 'string') return 'Invalid Input';
   let output = 0;
   const hashSet = new Set(['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x']);
 
@@ -53,6 +57,7 @@ function questionThree(str) {
 
 function questionFour(fullString, substring) {
   // TODO: Implement question 4 here
+  if (typeof fullString !== 'string' || typeof substring !== 'string') return 'Invalid Input';
   let r = 0;
   let output = 0;
 
