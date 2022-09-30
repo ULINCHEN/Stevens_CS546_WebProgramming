@@ -50,6 +50,7 @@ let changeChar = (string, index, replacement) => {
 
 let palindromes = (string) => {
       checkInput(string);
+      string = string.trim();
       const arr = stringProcessor(string);
       const output = [];
       for (let s of arr) {
@@ -60,6 +61,7 @@ let palindromes = (string) => {
 
 let replaceChar = (string) => {
       checkInput(string);
+      string = string.trim();
       let output = string;
       let rep = ["*", "$"];
       let index = 0;
@@ -79,6 +81,8 @@ let charSwap = (string1, string2) => {
       if (!string1 || !string2) throw "Error: Miss input(require 2)";
       if (typeof string1 !== 'string' || typeof string2 !== 'string') throw "Error: Input type should be string"
       if (string1.length < 4 || string2.length < 4 || string1.trim() == 0 || string2.trim() == 0) throw "Error: each string should have at least 4 characters."
+      string1 = string1.trim();
+      string2 = string2.trim();
 
       let output;
       let firstFour1 = string1.substring(0, 4);
@@ -100,6 +104,9 @@ module.exports = { palindromes, replaceChar, charSwap };
 console.log(palindromes('Wow! Did you see that racecar go?')); // Returns: ["Wow", "Did", "racecar"]
 console.log(palindromes('Hello World')); // Returns: []
 console.log(palindromes('kid kik aka tenet aakkaa cdc? for ever ofo')); */
+console.log(palindromes('       aaa            '));
+console.log(replaceChar('       aaa            '));
+console.log(charSwap('       aaa            ', '      bbbb      '));
 //console.log(palindromes()); // throws error
 //console.log(palindromes("    ")); //  throws error
 //console.log(palindromes(1));  //throws error
