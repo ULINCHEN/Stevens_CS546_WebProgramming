@@ -222,8 +222,8 @@ console.log(makeObjects([undefined, true], ["date", "9/11/2022"])); // returns {
 //const arr8 = [null, undefined, true];
 //const arr9 = ["2D case", ["foo", "bar"], "bye bye"]
 //const arr10 = [["foo", "bar"], true, "String", 10]
-//const arr11 = [[1, 2, 3], [3, 4, 5], [4, 5, 6]];
-//const arr12 = [[3, 4, 5]];
+const arr11 = [[1, 2, 3], [3, 4, 5], [4, 5, 6], '7', null, false, NaN];
+const arr12 = [[3, 4, 5], 7, false];
 
 //console.log(commonElements(arr1, arr2)); // Returns [5]
 //console.log(commonElements(arr3, arr4, arr5)); // returns ['Patrick']
@@ -232,7 +232,7 @@ console.log(makeObjects([undefined, true], ["date", "9/11/2022"])); // returns {
 //console.log(commonElements(arr7, arr8)); // returns [undefined]
 //console.log(commonElements(arr3, arr4, arr5, arr7)); // returns ['Patrick']
 //console.log(commonElements(arr9, arr10)); // returns [["foo", "bar"]] 
-//console.log(commonElements(arr11, arr12))
+console.log(commonElements(arr11, arr12))
 //commonElements(); // throws error
 //commonElements("test"); // throws error
 //commonElements([1,2,"nope"]); // throws error
