@@ -9,3 +9,14 @@ Lab Requirements:
 -You must submit a zip archive or you will lose points, named in the following format: LastName_FirstName_CS546_SECTION.zip  You will lose points for not submitting an archive.
 -DO NOT ADD ANY OTHER FILE OR FOLDER APART FROM PACKAGE.JSON (OR package-lock.json) FILE.
 */
+
+const express = require('express');
+const app = express();
+const configRoutes = require('./routes');
+
+configRoutes(app);
+
+app.listen(3000, () => {
+    console.log("We've now got a server!");
+    console.log('Your routes will be running on http://localhost:3000');
+});
