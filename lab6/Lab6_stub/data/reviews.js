@@ -1,6 +1,5 @@
 const { movies } = require('../config/mongoCollections');
 const { ObjectId } = require('mongodb');
-const { dbConnection } = require('../config/mongoConnection');
 const { getMovieById } = require('./movies');
 const validation = require('../helpers')
 
@@ -17,23 +16,19 @@ const createReview = async (
   if (!movieId || !reviewTitle || !reviewerName || !review || !rating) throw "Error:Missing Input";
 
   // 2, check string
-  const checkListOne = [movieId, reviewTitle, reviewerName, review];
-  checkListOne.forEach(element => {
-    element = validation.checkString(element, 'Reviewtitle, reviewer name or review');
-  })
+  movieId = validation.checkString(movieId, 'movie id');
+  reviewTitle = validation.checkString(reviewTitle, 'reviewTitle');
+  reviewerName = validation.checkString(reviewerName, 'reviewerName');
+  review = validation.checkString(review, 'review');
 
   // check movieId
   if (!ObjectId.isValid(movieId)) throw 'invalid object ID';
 
-
+  console.log('here');
   // check rating
+  rating = validation.checkRatingNumber(rating);
 
-  if (isNaN(rating) === true) throw '(Server)Rating should be a number';
-  rating = Number(rating);
-  if (rating < 1 || rating > 5) throw 'Rating should between 1 - 5';
-  rating = rating.toFixed(1);
-
-  // setup date
+  // setup current date
   const date = new Date();
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
@@ -55,17 +50,24 @@ const createReview = async (
   const res = col.find({ _id: movieId }).toArray();
   if (res.length == 0) throw `Movie with id: ${movieId} doesn't exsit`
 
-  return col
-    .updateOne({ _id: ObjectId(movieId) }, { $push: { review: reviewDoc } })
-    .then(async () => {
-      await validation.overallRatingUpdate(movieId);
-      const movie = await getMovieById(movieId);
-      console.log("movie data after updata review:", movie);
-    })
-    .then(async () => {
-      const movie = await getMovieById(movieId);
-      return movie.review;
-    })
+  await col.updateOne({ _id: ObjectId(movieId) }, { $push: { review: reviewDoc } });
+  await validation.overallRatingUpdate(movieId, col);// problem could be declare collection again inside this method.
+  const movie = await getMovieById(movieId);
+  const reviewData = movie.review;
+  console.log(reviewData);
+  return reviewData[reviewData.length - 1];
+
+  // return col
+  //   .updateOne({ _id: ObjectId(movieId) }, { $push: { review: reviewDoc } })
+  //   .then(async () => {
+  //     await validation.overallRatingUpdate(movieId);
+  //     const movie = await getMovieById(movieId);
+  //     console.log("movie data after updata review:", movie);
+  //   })
+  //   .then(async () => {
+  //     const movie = await getMovieById(movieId);
+  //     return movie.review;
+  //   })
 };
 
 const getAllReviews = async (movieId) => {
@@ -127,9 +129,8 @@ const removeReview = async (reviewId) => {
     }
   }
   await col.updateOne({ "review._id": ObjectId(reviewId) }, { $set: { "review": currentReview } });
-  console.log('here');
+  await validation.overallRatingUpdate(movieId, col);
   const result = await col.find({ _id: ObjectId(movieId) }).toArray();
-  console.log(result);
   return result;
 };
 

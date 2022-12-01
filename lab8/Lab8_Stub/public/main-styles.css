@@ -1,0 +1,70 @@
+/*This file should have CSS rulesets */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(203, 206, 201);
+}
+
+.homepageMain {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.homepageMain>p {
+    text-align: center;
+}
+
+.homepageMain>form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.homepageMain>form>label {
+    display: block;
+    margin-top: 10px;
+}
+
+.homepageMain>form>input {
+    display: block;
+    margin-top: 10px;
+}
+
+.homepageMain>form>button {
+    display: block;
+    margin-top: 10px;
+    background-color: rgb(203, 67, 125);
+    border: none;
+    transition: 0.5s;
+}
+
+.homepageMain>form>button:hover {
+    box-shadow: 5px 3px 3px rgb(209, 178, 43);
+    transition: 0.5s;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px gray solid;
+    border-radius: 15px;
+    margin-top: 25vh;
+    height: 400px;
+    width: 300px;
+    background-color: rgb(31, 171, 179);
+    overflow: scroll;
+}
+
+h1 {
+    color: rgb(209, 178, 43);
+}
+
+dt {
+    font-weight: 800;
+    margin-top: 5px;
+}

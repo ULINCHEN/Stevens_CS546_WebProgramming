@@ -98,7 +98,6 @@ router
     //code here for PUT
     let movieId = req.params.movieId.toString();
     let updateData = req.body;
-
     try {
       movieId = validation.checkId(movieId);
     }

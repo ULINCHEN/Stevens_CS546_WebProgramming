@@ -16,31 +16,30 @@ const createMovie = async (
 ) => {
 
   // input number check
-  const checkListOne = [title, plot, genres, rating, studio, director, castMembers, dateReleased, runtime];
-  checkListOne.forEach(element => {
-    if (!element) throw 'Insufficient Input Error (Server end)';
-  })
+  if (!title ||
+    !plot ||
+    !genres ||
+    !rating ||
+    !studio ||
+    !director ||
+    !castMembers ||
+    !dateReleased ||
+    !runtime) throw 'Insufficient Input Error (Server end)';
 
-  // input type check
-  const checkListTwo = [title, plot, rating, studio, director, dateReleased, runtime];
-  checkListTwo.forEach(element => {
-    if (typeof element != 'string' || element.trim().length == 0) throw 'Wrong Input Type Error: Invalid String';
-  })
+
+  // input  check
+  title = validation.checkString(title, "movie title");
+  plot = validation.checkString(plot, 'movie plot');
+  studio = validation.checkStudio(studio, 'studio');
+  director = validation.checkDirector(director, 'director');
+  dateReleased = validation.checkString(dateReleased, 'dateReleased');
+  runtime = validation.checkString(runtime, 'runtime');
 
   // special character check
-  title = validation.checkSpecialCharacter(title, 'title');
-
-
-  const arr = director.trim().split(' ');
-  if (arr.length != 2) throw 'Director should include firstname and lastname';
-  arr.forEach(element => {
-    if (element.length < 3) throw 'Firstname and last name should contains at least 3 characters';
-    element = validation.checkSpecialCharacter(element, 'Director Name');
-  })
+  title = validation.checkTitle(title, 'title');
 
   // rating check
-  const ratingSet = new Set(['G', 'PG', 'PG-13', 'R', ' NC-17']);
-  if (!ratingSet.has(rating)) throw 'Rating should be one of those: G, PG, PG-13, R, NC-17';
+  rating = validation.checkRating(rating);
 
   //genres check
   genres = validation.checkGenres(genres);
@@ -49,47 +48,22 @@ const createMovie = async (
   castMembers = validation.checkCastMembers(castMembers);
 
   // dateReleased check
-  if (dateReleased.length != 10 || dateReleased.charAt(2) != '/' || dateReleased.charAt(5) != '/') throw 'dateReleased Invalid: Wrong Format';
-  const date = dateReleased.trim().split('/');
-  // check month
-  if (parseInt(date[0]) <= 0 || parseInt(date[0]) > 12) throw 'dateReleased Invalid: Month value Invalid';
-  // check year
-  const thisYear = new Date().getFullYear();
-  if (parseInt(date[2]) < 1900 || parseInt(date[2]) - thisYear > 2) throw `dateReleased Invalid: years should not before 1900 or later than ${thisYear + 2}`;
-  // check days
-  const monthThatHasThirtyOneDays = new Set([1, 3, 5, 7, 8, 10, 12]);
-  const monthThatHasThirtyDays = new Set([4, 6, 9, 11]);
-  if (parseInt(date[1]) <= 0) throw 'dateReleased invalid: days value invalid';
-  if (parseInt(date[0]) == 2 && (parseInt(date[1]) > 28)) throw 'dateReleased Invalid: February should be 1 - 28 days';
-  if (monthThatHasThirtyOneDays.has(parseInt(date[0])) && (parseInt(date[1]) > 31)) throw 'dateReleased Invalid: should between 1 - 31 days';
-  if (monthThatHasThirtyDays.has(parseInt(date[0])) && (parseInt(date[1]) > 30)) throw 'dateReleased Invalid: should between 1 - 30 days';
+  dateReleased = validation.checkDate(dateReleased, 'dateReleased');
 
   // runtime check
-  const cache = runtime.trim().split(' ');
-  if (cache.length != 2) throw 'runtime input invalid';
-  if (cache[0].length < 2 || cache[1].length < 4) throw 'runtime input invalid: format should be #h #min';
-  if (cache[0].charAt(cache[0].length - 1) != 'h' || cache[1].substring(cache[1].length - 3, cache[1].length) != 'min') throw 'runtime input invalid: format should be #h #min';
-  cache[0] = cache[0].substring(0, cache[0].length - 1);
-  cache[1] = cache[1].substring(0, cache[1].length - 3);
-  if (isNaN(cache[0]) || isNaN(cache[1])) throw 'runtime input invalid: hour or min is not a valid number';
-  if (parseInt(cache[0]) <= 0 || parseInt(cache[0]) % 1 > 0 || parseInt(cache[1]) < 0 || parseInt(cache[1]) > 59) throw 'runtime input invalid: hour or min is not a valid number';
-  if (parseInt(cache[1]) % 1 > 0) {
-    const temp = cache[1].split('.');
-    if (parseInt(temp[1]) < 0 || parseInt(temp[1]) > 59) throw 'runtime input invalid: hour or min is not a valid number';
-  }
-
+  runtime = validation.checkRunTime(runtime);
 
   // create obj
   const output = {
-    title: title.trim(),
-    plot: plot.trim(),
+    title: title,
+    plot: plot,
     genres: genres,
     rating: rating,
-    studio: studio.trim(),
-    director: director.trim(),
+    studio: studio,
+    director: director,
     castMembers: castMembers,
-    dateReleased: dateReleased.trim(),
-    runtime: runtime.trim(),
+    dateReleased: dateReleased,
+    runtime: runtime,
     overallRating: 0,
     review: [],
   }
@@ -173,68 +147,40 @@ const updateMovie = async (
     throw 'Insufficient Input Error';
   }
 
-  const specialChars = /^[a-zA-Z\s]+$/;
-  const checkListOne = [movieId, title, plot, rating, studio, director, dateReleased, runtime];
-  checkListOne.forEach(element => {
-    if (typeof element != 'string' || element.trim().length == 0) throw 'Wrong Input Type Error: Invalid String';
-  })
+  // input type check
+  movieId = validation.checkString(movieId, 'movie ID');
+  title = validation.checkTitle(title, 'title');
+  plot = validation.checkString(plot, 'movie plot');
+  studio = validation.checkStudio(studio, 'studio');
+  director = validation.checkDirector(director, 'director');
+  dateReleased = validation.checkString(dateReleased, 'dateReleased');
+  runtime = validation.checkString(runtime, 'runtime');
 
   // movieId check
   if (!ObjectId.isValid(movieId)) throw 'invalid object ID';
 
   // genres check
-  if (Array.isArray(genres) == false || genres.length == 0) throw 'Genres is Invalid';
-  let newGenres = [];
-  for (let item of genres) {
-    if (typeof item != 'string') throw 'Each item in genres should be string';
-    item = validation.checkSpecialCharacter(item, 'genres item');
-    newGenres.push(item.trim());
-  }
-  genres = newGenres;
+  genres = validation.checkGenres(genres);
 
   // castmember check
   castMembers = validation.checkCastMembers(castMembers);
 
   // dateReleased check
-  if (dateReleased.length != 10 || dateReleased.charAt(2) != '/' || dateReleased.charAt(5) != '/') throw 'dateReleased Invalid: Wrong Format';
-  const date = dateReleased.trim().split('/');
-  // check month
-  if (parseInt(date[0]) <= 0 || parseInt(date[0]) > 12) throw 'dateReleased Invalid: Month value Invalid';
-  // check year
-  const thisYear = new Date().getFullYear();
-  if (parseInt(date[2]) < 1900 || parseInt(date[2]) - thisYear > 2) throw `dateReleased Invalid: years should not before 1900 or later than ${thisYear + 2}`;
-  // check days
-  const monthThatHasThirtyOneDays = new Set([1, 3, 5, 7, 8, 10, 12]);
-  const monthThatHasThirtyDays = new Set([4, 6, 9, 11]);
-  if (parseInt(date[1]) <= 0) throw 'dateReleased invalid: days value invalid';
-  if (parseInt(date[0]) == 2 && (parseInt(date[1]) > 28)) throw 'dateReleased Invalid: February should be 1 - 28 days';
-  if (monthThatHasThirtyOneDays.has(parseInt(date[0])) && (parseInt(date[1]) > 31)) throw 'dateReleased Invalid: should between 1 - 31 days';
-  if (monthThatHasThirtyDays.has(parseInt(date[0])) && (parseInt(date[1]) > 30)) throw 'dateReleased Invalid: should between 1 - 30 days';
+  dateReleased = validation.checkDate(dateReleased, 'dateReleased');
 
   // runtime check
-  const cache = runtime.trim().split(' ');
-  if (cache.length != 2) throw 'runtime input invalid';
-  if (cache[0].length < 2 || cache[1].length < 4) throw 'runtime input invalid: format should be #h #min';
-  if (cache[0].charAt(cache[0].length - 1) != 'h' || cache[1].substring(cache[1].length - 3, cache[1].length) != 'min') throw 'runtime input invalid: format should be #h #min';
-  cache[0] = cache[0].substring(0, cache[0].length - 1);
-  cache[1] = cache[1].substring(0, cache[1].length - 3);
-  if (isNaN(cache[0]) || isNaN(cache[1])) throw 'runtime input invalid: hour or min is not a valid number';
-  if (parseInt(cache[0]) <= 0 || parseInt(cache[0]) % 1 > 0 || parseInt(cache[1]) < 0 || parseInt(cache[1]) > 59) throw 'runtime input invalid: hour or min is not a valid number';
-  if (parseInt(cache[1]) % 1 > 0) {
-    const temp = cache[1].split('.');
-    if (parseInt(temp[1]) < 0 || parseInt(temp[1]) > 59) throw 'runtime input invalid: hour or min is not a valid number';
-  }
+  runtime = validation.checkRunTime(runtime);
 
   const updateInfo = {
-    title: title.trim(),
-    plot: plot.trim(),
+    title: title,
+    plot: plot,
     genres: genres,
     rating: rating,
-    studio: studio.trim(),
-    director: director.trim(),
+    studio: studio,
+    director: director,
     castMembers: castMembers,
-    dateReleased: dateReleased.trim(),
-    runtime: runtime.trim(),
+    dateReleased: dateReleased,
+    runtime: runtime,
   }
   // connect to db and create collection
   const col = await movies();

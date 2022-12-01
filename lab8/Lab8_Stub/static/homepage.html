@@ -1,0 +1,35 @@
+<!-- 
+This page will be shown when the following route is hit: GET http://localhost:3000/
+This page will be a valid HTML document. 
+The title of the document should be "People Finder". You should have the title set as the <title> element of the HTML document and as an h1 in your document.
+Your page should reference a CSS file, /public/main-styles.css; with at least 10 rulesets that apply to this page; these 10 rules can also apply to elements across all of your pages, or be unique to this page.
+You should have a main element, and inside of the main element have a p element with a brief (2-3 sentence description) of what your website does.
+Also inside the main element, you will have a form; this form will POST to /searchpeople. This form will have an input and a label; the label should properly reference the same id as the input. You should also have a button with a type of submit that submits the form. The input in your form should have a name of searchPersonName.
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../public/main-styles.css">
+    <title>People Finder</title>
+</head>
+
+<body>
+    <main class="homepageMain">
+        <h1>People Finder</h1>
+        <p>Search for Anyone, Anywhere, Anytime</p>
+        <form method="POST" action="/searchpeople">
+            <label for="textInput">Input the name you want to search:</label>
+            <input type="text" id="textInput" placeholder="Tom Hanks" name="searchPersonName">
+            <button type="submit">submit</button>
+        </form>
+    </main>
+
+
+</body>
+
+</html>

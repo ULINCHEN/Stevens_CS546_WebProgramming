@@ -168,7 +168,6 @@ const main = async () => {
         await movies.createMovie(movieDataFour.title, movieDataFour.plot, movieDataFour.genres, movieDataFour.rating, movieDataFour.studio, movieDataFour.director, movieDataFour.castMembers, movieDataFour.dateReleased, movieDataFour.runtime);
         await movies.createMovie(movieDataFive.title, movieDataFive.plot, movieDataFive.genres, movieDataFive.rating, movieDataFive.studio, movieDataFive.director, movieDataFive.castMembers, movieDataFive.dateReleased, movieDataFive.runtime);
 
-        console.log(test1);
         movieId = test1._id.toString();
 
     }

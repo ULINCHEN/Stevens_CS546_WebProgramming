@@ -73,6 +73,31 @@ const checkId = (id) => {
     return id;
 }
 
+const checkStringLength = (string, minLength, inputName) => {
+    if (string.length < minLength) throw `${inputName} length should be at least ${minLength}`;
+    return string.trim();
+}
+
+const checkTitle = (title, inputName) => {
+    title = checkString(title, inputName);
+    title = checkSpecialCharacter(title, inputName);
+    title = checkStringLength(title, 2, inputName);
+    return title;
+}
+
+const checkStudio = (studio, inputName) => {
+    studio = checkString(studio, inputName);
+    studio = checkSpecialCharacterNoNumber(studio, inputName);
+    studio = checkStringLength(studio, 5, inputName);
+    return studio;
+}
+
+const checkDirector = (director, inputName) => {
+    director = checkString(director, inputName);
+    director = checkName(director, inputName);
+    return director;
+}
+
 const checkString = (string, inputName) => {
     if (!string) throw `You mush provide a ${inputName}`;
     if (typeof string != 'string') throw `${inputName}'s type should be string`;
@@ -96,6 +121,13 @@ const checkStringArray = (arr, inputName) => {
     return arr;
 }
 
+const checkSpecialCharacterNoNumber = (string, inputName) => {
+    const specialChars = /^[a-zA-Z\s]+$/;
+    string = string.trim();
+    if (specialChars.test(string) === false) throw `${inputName} should only contains character a-z and A-Z`;
+    return string;
+}
+
 const checkSpecialCharacter = (string, inputName) => {
     const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
     string = string.trim();
@@ -109,7 +141,7 @@ const checkName = (name, inputName) => {
     if (arr.length != 2) throw `${inputName} should have firstname and lastname`;
     arr.forEach(element => {
         if (element.length < 3) throw 'Firstname and last name should contains at least 3 characters';
-        if (specialChars.test(element) == false) throw 'director should not contain special character';
+        if (specialChars.test(element) == false) throw 'director should not contain special character or number';
     })
     return name.trim();
 }
@@ -122,14 +154,13 @@ const checkRating = (rating) => {
 }
 
 const checkGenres = (genres) => {
-    if (Array.isArray(genres) == false || genres.length == 0) throw 'Genres is Invalid';
+    genres = checkStringArray(genres, 'genres');
     let newGenres = [];
-    const specialChars = /^[a-zA-Z\s]+$/;
     for (let item of genres) {
-        if (typeof item != 'string') throw 'Each item in genres should be string';
-        if (specialChars.test(item.trim()) == false || item.trim() == 0) throw 'Genres itme is Invalid';
-        if (item.trim().length < 5) throw 'Genres item should have at least 5 characters.'
-        newGenres.push(item.trim());
+        item = checkString(item, 'genres item');
+        item = checkSpecialCharacterNoNumber(item, 'genres item');
+        item = checkStringLength(item, 5, 'genres item');
+        newGenres.push(item);
     }
     genres = newGenres;
     return genres;
@@ -176,13 +207,14 @@ const checkCastMembers = (castMembers) => {
     const specialChars = /^[a-zA-Z\s]+$/;
     const newCastMember = [];
     for (let item of castMembers) {
-        if (!item || typeof item != 'string' || item.trim().length == 0) throw 'castMember item should be a valid string';
-        const cache = item.trim().split(' ');
+        item = checkString(item, 'castMembers item');
+        const cache = item.split(' ');
         if (cache.length != 2) throw 'castMember should include firstname and lastname';
         if (cache[0].length < 3 || cache[1].length < 3) throw 'castMember firstname and lastname should have at least 3 character each';
-        if (specialChars.test(cache[0]) == false || specialChars.test(cache[1]) == false) throw 'castMember firstname and lastname should not have speical character';
+        cache[0] = checkSpecialCharacterNoNumber(cache[0], 'castMember firstname');
+        cache[1] = checkSpecialCharacterNoNumber(cache[1], 'castMember lastname');
         if (cache[0].charAt(0) != cache[0].charAt(0).toUpperCase() || cache[1].charAt(0) != cache[1].charAt(0).toUpperCase()) throw 'first character of firstname and lastname should be Uppercase';
-        newCastMember.push(item.trim());
+        newCastMember.push(item);
     }
     castMembers = newCastMember;
     return castMembers;
@@ -191,6 +223,8 @@ const checkCastMembers = (castMembers) => {
 const checkRatingNumber = (rating) => {
     if (isNaN(rating) === true) throw 'Rating should be a number';
     if (rating < 1 || rating > 5) throw 'Rating should between 1 - 5';
+    //rating = rating.toFixed(1);
+    rating = Number(rating);
     rating = rating.toFixed(1);
     return rating;
 }
@@ -200,9 +234,9 @@ const checkReview = (reviewTitle, reviewerName, review, rating) => {
     if (!reviewTitle || !reviewerName || !review || !rating) throw 'Error: Missing Input';
 
     // check string
-    reviewTitle = checkString(reviewTitle);
-    reviewerName = checkString(reviewerName);
-    review = checkString(review);
+    reviewTitle = checkString(reviewTitle, 'reviewTitle');
+    reviewerName = checkString(reviewerName, 'reviewerName');
+    review = checkString(review, 'review');
 
     // check rating
     rating = checkRatingNumber(rating);
@@ -215,43 +249,50 @@ const checkReview = (reviewTitle, reviewerName, review, rating) => {
     return output;
 }
 
-const overallRatingUpdate = async (movieId) => {
-    const collection = await movies();
+const overallRatingUpdate = async (movieId, collection) => {
     const movieData = await collection.findOne({ _id: ObjectId(movieId) });
-    const reviewData = movieData.reviews;
-    const overallRating = undefined;
+    const reviewData = await movieData.review;
+    let totalRating = undefined;
     // if no review, set overall rating to 0;
     if (reviewData.length === 0) {
-        overallRating = 0;
+        totalRating = 0;
     }
 
     // if only one review, set overall rating to this reivew rating;
     else if (reviewData.length === 1) {
-        overallRating = Number(reviewData[0].rating);
+        totalRating = Number(reviewData[0].rating);
     }
 
     // else, get average value of all rating
+
     else {
         let allData = 0;
         for (let review of reviewData) {
             allData += Number(review.rating);
         }
-        overallRating = allData / (reviewData.length);
-        overallRating = overallRating.toFixed(1);
-    }
+        totalRating = allData / (reviewData.length);
 
-    await collection.updateOne({ _id: ObjectId(movieId) }, { $set: { overallRating: overallRating } });
+        // overallRating = overallRating.toFixed(1);
+    }
+    totalRating = totalRating.toFixed(1);
+    console.log("overall review updated: ", totalRating);
+    const updateDoc = { $set: { overallRating: totalRating } }
+    return await collection.updateOne({ _id: ObjectId(movieId) }, updateDoc);
 
 }
 
 module.exports = {
     postMovieCheck,
     checkId,
+    checkTitle,
+    checkStudio,
+    checkDirector,
     checkString,
     checkStringArray,
     checkSpecialCharacter,
     checkName,
     checkRating,
+    checkRatingNumber,
     checkGenres,
     checkDate,
     checkRunTime,

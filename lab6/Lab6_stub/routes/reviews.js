@@ -31,7 +31,6 @@ router
     //code here for POST
     let movieId = req.params.movieId;
     let content = req.body;
-
     try {
       movieId = validation.checkId(movieId);
       content = validation.checkReview(
@@ -53,6 +52,7 @@ router
         content.review,
         content.rating
       );
+
       res.status(200).json(result);
     }
     catch (e) {
